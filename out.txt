@@ -1,0 +1,2 @@
+ls: #ababa: No such file or directory
+ls: /nonexistdir: No such file or directory
