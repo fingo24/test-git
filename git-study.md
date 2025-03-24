@@ -1,10 +1,10 @@
-# git study
-
 [TOC]
+
+# git study
 
 ## 初始化一个github的test-git repository
 
-```git
+```bash
 echo "# test-git" >> README.md
 git init
 git add README.md
@@ -26,10 +26,10 @@ git push -u origin main
     - 如何换行输出: echo要支持同C语言一样的\转义功能，只需要加上参数-e，如下所示：
 
       ```echo "Hello world.\nHello sea"```
-	  Hello world.\nHello sea
-	  ```echo -e "Hello world.\nHello sea"```
-	  Hello world.
-	  Hello sea
+		  Hello world.\nHello sea
+		  ```echo -e "Hello world.\nHello sea"```
+		  Hello world.
+		  Hello sea
 
 ---
  
@@ -88,7 +88,7 @@ git push -u origin main
 	  - URL格式：支持HTTPS/SSH两种协议（SSH需配置密钥）  
 	- 验证命令：
 	  - `git remote -v`：查看已配置的远程仓库地址  
- 	 - `git remote rm origin`：删除错误配置的远程连接  
+ 	  - `git remote rm origin`：删除错误配置的远程连接  
  
 ---
  
@@ -206,17 +206,27 @@ git push -u origin main
 	`rm -rf /path/to/parent/*/.git`（这会删除所有子目录的 Git 仓库）
 	`rm -rf /path/to/parent/.git`（仅删除父目录的 Git 仓库）
 
+3. 要查询本地所有被 Git 控制的文件夹位置（即包含 .git 目录的文件夹），可以通过以下方法实现:  
+	```bash
+	# 递归搜索当前目录下的所有 .git 文件夹，并输出其父目录路径
+	find /path/to/search -name ".git" -type d 2>/dev/null | sed 's/\/.git//'
+	```
+	替换 /path/to/search：如搜索整个硬盘用 /（macOS/Linux），或指定目录如 ~/Documents;排除某些路径（如缓存目录）：
+	```bash
+	find / -name ".git" -type d 2>/dev/null -not -path "/tmp/*" -not -path "/node_modules/*"
+	```
+
 ---
 
 ## 几个常用的git语句
 
-1. 设置姓名
+1. 设置姓名  
 	`git config --global user.name ""`
 
-2. 设置邮箱
+2. 设置邮箱  
 	`git config --global user.email "< your_email@email.com>"`
 
-3. git fetch
+3. git fetch  
 	`git fetch`：仅获取远程更新，不修改本地代码
 		**示例**：
 		```bash
@@ -338,26 +348,25 @@ git push -u origin main
 
 ## 几个shell常用语句
 
-  1. printf命令比echo更加强大，支持格式化输出。
+1. printf命令比echo更加强大，支持格式化输出  
    `printf "这是一些文本内容\n" > filename.txt`
-   
-  2. 使用rm命令
-   
+ 
+2. 使用rm命令     
    `rm filename.txt`
    `rm *.txt`
-   
-  3. 创建文件夹
+ 
+3. 创建文件夹     
    `mkdir 新文件夹名`
    -p：递归创建目录，即创建多级目录。如果上级目录不存在，则会一并创建; 否则则会提示错误，并且无法创建出你所要创建的目录
    `mkdir -p 父目录/子目录/子子目录`
-   
-  4. 删除文件夹
+ 
+4. 删除文件夹     
    删除空文件夹
    `rmdir 文件夹名`
    删除非空文件夹(-r: 递归删除，用于删除子目录及文件)
    `rm -r 文件夹名`
 
-  5. ls详解
+5. ls详解     
    [Linux系统命令-ls详解 ](https://www.cnblogs.com/weq0805/p/14873267.htm) 
 
 		|  选项名称   | 说明  |
@@ -371,8 +380,9 @@ git push -u origin main
 		| -color  | 在字符模式中以颜色区分不同的文件。默认已开启 |
 		| -i  | index node, inode 显示文件的缩影节点号 |
 
-    - `ls -l`输出关联性 
-			 完整字段示例：
+   - `ls -l`输出关联性:
+
+			 完整字段示例:
 			   ```shell 
 			   -rw-r--r-- 1 user group 1024 Mar 13 15:33 example.txt 
 			   drwxr-xr-x 2 user group 4096 Mar 13 15:34 mydir 
@@ -380,75 +390,77 @@ git push -u origin main
 			   - 第1字段：`-rw-r--r--`或`drwxr-xr-x`表示类型+权限 
 			   - 后续字段：依次为硬链接数、所有者、所属组、大小、修改时间、名称
 
-   - 补充说明:Linux文件权限
-   	1) `rwxr-xr-x (755)` 解析 
-			1. 结构分解
-			   - 首字符：`d`或`-`（此处缺失，推测为目录）
-			     - `d`代表目录，`-`代表普通文件（根据`ls -l`输出首字符判断）
-			   - 权限分组：
-			     - 用户(owner): `rwx` → 可读(r=4)、可写(w=2)、可执行(x=1) → 4+2+1=7
-			     - 用户组(group): `r-x` → 可读、不可写、可执行 → 4+0+1=5 
-			     - 其他用户(others): `r-x` → 同上 → 5 
-			 
-			2. 典型应用场景
-			   - 目录权限：常见于系统目录如`/usr/bin`，允许用户浏览和执行文件，但禁止非所有者修改
-			   - 可执行文件：如脚本文件需`x`权限才能运行 
+   - 补充说明:Linux文件权限:
 
-		2) `-rw-r--r-- (644)` 解析 
-			1. 结构分解
-			   - 首字符：`-`明确表示为普通文件 
-			   - 权限分组：
-			     - 用户: `rw-` → 可读、可写、不可执行 → 4+2+0=6 
-			     - 用户组: `r--` → 仅可读 → 4 
-			     - 其他用户: `r--` → 同上 → 4 
-			 
-			2. 典型应用场景
-			   - 配置文件：如`.bashrc`允许用户修改，其他用户仅可查看
-			   - 文本文件：日志文件常设此权限防止误删改 
+			1) `rwxr-xr-x (755)` 解析 
+				1. 结构分解
+				   - 首字符：`d`或`-`（此处缺失，推测为目录）
+				     - `d`代表目录，`-`代表普通文件（根据`ls -l`输出首字符判断）
+				   - 权限分组：
 
-		3) 权限修改方法 
-			1. 符号模式：
-			   ```shell 
-			   chmod u+x file    # 给所有者添加执行权限 
-			   chmod go-w dir    # 移除组和其他用户的写权限 
-			   ```
-			2. 数字模式：
-			   ```shell 
-			   chmod 755 script.sh  # 设为rwxr-xr-x 
-			   chmod 644 config.ini # 设为rw-r--r--
-			   ```
+				     - 用户(owner): `rwx` → 可读(r=4)、可写(w=2)、可执行(x=1) → 4+2+1=7
+				     - 用户组(group): `r-x` → 可读、不可写、可执行 → 4+0+1=5 
+				     - 其他用户(others): `r-x` → 同上 → 5 
+				 
+				2. 典型应用场景
+				   - 目录权限：常见于系统目录如`/usr/bin`，允许用户浏览和执行文件，但禁止非所有者修改
+				   - 可执行文件：如脚本文件需`x`权限才能运行 
 
-		4) 特殊场景说明 
-			1. 权限生成机制
-			   - 新建文件默认权限为`666 - umask`（通常umask=022 → 644）
-			   - 新建目录默认权限为`777 - umask`（通常umask=022 → 755）
-			2. 可执行权限差异：
-			  - 对目录：`x`表示可进入（如`cd mydir`需此权限）
-			  - 对文件：`x`表示可直接运行（如`./app`）
-			3. 危险权限组合：
-			  - `rwxrwxrwx (777)`：所有用户可任意修改，需谨慎使用
+			2) `-rw-r--r-- (644)` 解析 
+				1. 结构分解
+				   - 首字符：`-`明确表示为普通文件 
+				   - 权限分组：
+				     - 用户: `rw-` → 可读、可写、不可执行 → 4+2+0=6 
+				     - 用户组: `r--` → 仅可读 → 4 
+				     - 其他用户: `r--` → 同上 → 4 
+				 
+				2. 典型应用场景
+				   - 配置文件：如`.bashrc`允许用户修改，其他用户仅可查看
+				   - 文本文件：日志文件常设此权限防止误删改 
 
-	6. 通配符
+			3) 权限修改方法 
+				1. 符号模式：
+				   ```shell 
+				   chmod u+x file    # 给所有者添加执行权限 
+				   chmod go-w dir    # 移除组和其他用户的写权限 
+				   ```
+				2. 数字模式：
+				   ```shell 
+				   chmod 755 script.sh  # 设为rwxr-xr-x 
+				   chmod 644 config.ini # 设为rw-r--r--
+				   ```
+
+			4) 特殊场景说明      
+				1. 权限生成机制
+				   - 新建文件默认权限为`666 - umask`（通常umask=022 → 644）
+				   - 新建目录默认权限为`777 - umask`（通常umask=022 → 755）
+				2. 可执行权限差异：
+				  - 对目录：`x`表示可进入（如`cd mydir`需此权限）
+				  - 对文件：`x`表示可直接运行（如`./app`）
+				3. 危险权限组合：
+				  - `rwxrwxrwx (777)`：所有用户可任意修改，需谨慎使用
+
+6. 通配符:     
 		|  通配符   | 含义  |
 		|  -------  | ---------------------|
 		| ？（问号） | 代表任意1个字符，有且一个字符 |
 		| * （星号） | 代表任意数个字符，可以是0个或者1个或者多个 |
 		| [ ]（中括号） | 表示可以匹配字符组中的任意一个字符 |
-	
-	7. .的作用
+
+7. .的作用     
 		指代表示操作范围是当前目录下的所有文件/目录。
 		如`open .`	
 		会在finder打开当前目录的文件夹;
 		如`git rm -rf .`
 		强制递归删除当前目录下所有已被 Git 跟踪的文件和子目录。
 
-	8. 查看文件内容
+8. 查看文件内容     
 		`cat testfile.txt`
 
-	9. 输出重定向符号>和>>
+9. 输出重定向符号>和>>     
 		">" 符号：覆盖目标文件的内容。如果文件不存在，则创建文件。
 		">>" 符号：追加内容到目标文件的末尾。如果文件不存在，则创建文件。	
-		举例:
+		举例:  
 		```shell
 		echo "Hello, World!" > output.txt
 		ls -l > files.txt    #将ls命令的输出重定向到文件
@@ -464,8 +476,8 @@ git push -u origin main
     - /dev/null 文件
     	如果希望执行某个命令，但又不希望在屏幕上显示输出结果，那么可以将输出重定向到 /dev/null
     	如"who > /dev/null"
-    	
-	10. 输入重定向符<
+   	
+10. 输入重定向符<     
 		在Shell中，我们使用'<'操作符来进行输入重定向。我们可以将文件内容作为命令的输入。
 
 		`grep "Hello" < file.txt` #此命令会将file.txt的内容作为grep命令的输入，搜索包含"Hello"的行。
@@ -486,7 +498,7 @@ git push -u origin main
 				EOF
 				```
 
-	11. 管道操作符('|')与列表操作符('&&'和'||')
+11. 管道操作符('|')与列表操作符('&&'和'||')     
 		管道操作符(将一个命令的输出作为另一个命令的输入):
 		`ls -l | grep "txt"` #此命令会列出当前目录的所有文件信息并寻找包含"txt"的行
 
@@ -496,7 +508,7 @@ git push -u origin main
 		'||'操作会在前一命令失败后才会执行下一个命令:
 		`cd /nonexistdir || echo "Failed to change directory"` #此命令会尝试进入/nonexistdir目录，如果失败则会输出"Failed to change directory"。
 
-	12. patch用法
+12. patch用法     
 		把xxx.patch和要打补丁的文件放到一起到要打补丁文件 目录下执行上述命令会把补丁打进去更新现有文件
 		```bash
 		# 打补丁 
@@ -515,13 +527,13 @@ git push -u origin main
 
 		使用find处理多个补丁文件:
 			`find patches/ -name "*.patch" -exec patch -p1 < {} \;`
-			解析:递归搜索 patches/ 目录下的所有 .patch 文件；对每个找到的 .patch 文件执行 patch 命令({} 是占位符，会被替换为当前找到的文件路径（例如 patches/fix-bug1.patch）；`\;` 表示命令结束)
+			解析:递归搜索 patches/ 目录下的所有 .patch 文件；对每个找到的 .patch 文件执行 patch 命令({} 是占位符，会被替换为当前找到的文件路径（例如 patches/fix-bug1.patch），`\;` 表示命令结束)
 
-	13. who和w
+13. who和w     
 		w：展示哪些用户正在登录
 		who：展示哪些用户正在登录
 
-	14. wc(word count)
+14. wc(word count)     
 		默认输出为 行数、单词数、字节数
 
 		-l 统计文件的行数
@@ -541,7 +553,7 @@ git push -u origin main
 		EOF	 # 输出结果为 3	
 		```
 
-	15. find
+15. find     
 		find [起始目录] [查找条件] [操作]
 
 		[查找条件]
@@ -575,7 +587,101 @@ git push -u origin main
 
 		```
 
+16. grep  
+		grep 是 Linux 中用于搜索文本的强大命令，它能根据给定的模式在文件或标准输入中查找匹配的行，并将包含匹配模式的行输出。
+		
+		grep [选项] 搜索模式 文件
+		搜索模式：可以是一个字符串或正则表达式，用来匹配文件中的内容。
+		文件：指定要搜索的文件或路径。
+
+		[常用选项]
+			示例:
+				```shell
+				[root@test test]# cat test.txt
+				ni hao lisi
+				hello zhangsan
+				wo shi wangwu
+				hello zhaoliu
+				[root@test test]# grep "hello" test.txt
+				hello zhangsan
+				hello zhaoliu
+				```
+			-i：忽略大小写
+			-v：反向匹配,只显示不匹配搜索模式的行
+			-r 或 -R：递归搜索目录
+			-n：显示行号
+			-c：只显示匹配的行数,而不是具体内容。
+			-l 和 -L：只显示文件名
+				```bash
+				[root@test test]# grep -l "hello" *.txt
+				test.txt
+				```
+			-w：匹配整个单词,只匹配完整的单词，而不是单词的一部分。
+			-x：匹配整行,只有当整行匹配搜索模式时才显示该行。
+				```bash
+				[root@test test]# grep -x "hello" test.txt
+				[root@test test]# grep -x "hello zhaoliu" test.txt
+				hello zhaoliu
+				```
+			-A、-B、-C：显示上下文行
+				-A n：显示匹配行之后的 n 行。
+				-B n：显示匹配行之前的 n 行。
+				-C n：显示匹配行前后各 n 行。
+			-E：使用扩展正则表达式,启用扩展正则表达式（等同于 egrep），支持更多正则表达式操作符，如 |, +, ?, {} 等。
+				次数匹配模式如下：
+	        \*: 任意次
+	        ?：0或1次
+	        +: 至少1次
+	        {m}：精确匹配m次；
+	        {m,n}：至少m次，至多n次；
+	        {m,}：至少m次；
+	        {0,n}：至多次；
+	      `grep -E "hello|world" file.txt`
+	    -f：从文件中读取模式,从指定文件中读取多行模式进行搜索。
+	    	`grep -f pattern.txt file.txt`	在 file.txt 中查找 pattern.txt 文件中的每个模式。
+	    -o：仅输出匹配部分,而不是整行。
+
+	  grep 正则表达式示例：
+	  	匹配开头的字符串 ^：`grep "^hello" file.txt`
+	  	匹配行尾的字符串 $：`grep "world$" file.txt`
+	  	匹配任意单字符 .：`grep "h.llo" file.txt`
+	  	匹配多个字符 \*：grep "hel\*o" file.txt
+	  	匹配字符范围 [a-z]：`grep "h[a-z]llo" file.txt`
+	  	匹配多个模式 |（需配合 -E 或 egrep 使用）：`grep -E "hello|world" file.txt`
+
+	  实用示例:
+	  	在系统日志中查找错误信息:
+	  		```bash
+	  		[root@test test]# grep -i "error" /var/log/messages
+				Nov 10 15:04:18 test kernel: BERT: Boot Error Record Table support is disabled. Enable it by using bert_enable as kernel parameter.
+				Nov 10 15:04:25 test mcelog: ERROR: AMD Processor family 23: mcelog does not support this processor.  Please use the edac_mce_amd module instead.
+				```
+			查找包含多个关键字的行:
+				```bash
+				[root@test test]# grep -i "error" /var/log/messages |grep "Unable"
+				Nov 10 15:04:27 test libvirtd: 2024-11-10 07:04:27.035+0000: 1432: error : virHostCPUGetTscInfo:1389 : Unable to open /dev/kvm: No such file or directory
+				Nov 10 15:04:27 test libvirtd: 2024-11-10 07:04:27.173+0000: 1432: error : virHostCPUGetTscInfo:1389 : Unable to open /dev/kvm: No such file or directory
+				Nov 10 15:04:27 test libvirtd: 2024-11-10 07:04:27.174+0000: 1432: error : virHostCPUGetTscInfo:1389 : Unable to open /dev/kvm: No such file or directory
+				```
+			忽略二进制文件搜索文本:
+				`grep -I "hello" *`
+					-I	忽略二进制文件，仅搜索文本文件。
+					\*	Shell通配符，匹配当前目录下的所有非隐藏文件和子目录名。
+			从命令输出中查找特定行:
+				```bash
+				[root@test test]# dmesg |grep "usb"
+				[    0.678613] usbcore: registered new interface driver usbfs
+				[    0.678618] usbcore: registered new interface driver hub
+				[    0.678720] usbcore: registered new device driver usb
+				```
+
+17. cp  
+	复制文件或目录
+	`cp /home/user/file.txt /home/user/Documents`
+
+
 ---
+
 # 杂项
 
 ## 关于.DS_Store文件
