@@ -352,9 +352,10 @@ git push -u origin main
    `printf "这是一些文本内容\n" > filename.txt`
  
 2. 使用rm命令     
-   `rm filename.txt`
-   `rm *.txt`
- 
+	`rm filename.txt`
+	`rm *.txt`
+		`rm -i *.?`交互式执行rm命令，每个匹配的文件将依次显示。如果回答“y”或“Y”，则文件将被删除。如果回答其他，则保留该文件。
+ 		
 3. 创建文件夹     
    `mkdir 新文件夹名`
    -p：递归创建目录，即创建多级目录。如果上级目录不存在，则会一并创建; 否则则会提示错误，并且无法创建出你所要创建的目录
@@ -590,12 +591,12 @@ git push -u origin main
 16. grep  
 		grep 是 Linux 中用于搜索文本的强大命令，它能根据给定的模式在文件或标准输入中查找匹配的行，并将包含匹配模式的行输出。
 		
-		grep [选项] 搜索模式 文件
-		搜索模式：可以是一个字符串或正则表达式，用来匹配文件中的内容。
-		文件：指定要搜索的文件或路径。
+		grep [选项] 搜索模式 文件  
+		搜索模式：可以是一个字符串或正则表达式，用来匹配文件中的内容。 
+		文件：指定要搜索的文件或路径。  
 
-		[常用选项]
-			示例:
+		[常用选项]  
+			示例:  
 				```shell
 				[root@test test]# cat test.txt
 				ni hao lisi
@@ -641,7 +642,7 @@ git push -u origin main
 	    	`grep -f pattern.txt file.txt`	在 file.txt 中查找 pattern.txt 文件中的每个模式。
 	    -o：仅输出匹配部分,而不是整行。
 
-	  grep 正则表达式示例：
+	  grep 正则表达式示例：  
 	  	匹配开头的字符串 ^：`grep "^hello" file.txt`
 	  	匹配行尾的字符串 $：`grep "world$" file.txt`
 	  	匹配任意单字符 .：`grep "h.llo" file.txt`
@@ -649,8 +650,8 @@ git push -u origin main
 	  	匹配字符范围 [a-z]：`grep "h[a-z]llo" file.txt`
 	  	匹配多个模式 |（需配合 -E 或 egrep 使用）：`grep -E "hello|world" file.txt`
 
-	  实用示例:
-	  	在系统日志中查找错误信息:
+	  实用示例:  
+	  	在系统日志中查找错误信息:  
 	  		```bash
 	  		[root@test test]# grep -i "error" /var/log/messages
 				Nov 10 15:04:18 test kernel: BERT: Boot Error Record Table support is disabled. Enable it by using bert_enable as kernel parameter.
@@ -663,11 +664,11 @@ git push -u origin main
 				Nov 10 15:04:27 test libvirtd: 2024-11-10 07:04:27.173+0000: 1432: error : virHostCPUGetTscInfo:1389 : Unable to open /dev/kvm: No such file or directory
 				Nov 10 15:04:27 test libvirtd: 2024-11-10 07:04:27.174+0000: 1432: error : virHostCPUGetTscInfo:1389 : Unable to open /dev/kvm: No such file or directory
 				```
-			忽略二进制文件搜索文本:
+			忽略二进制文件搜索文本:  
 				`grep -I "hello" *`
 					-I	忽略二进制文件，仅搜索文本文件。
 					\*	Shell通配符，匹配当前目录下的所有非隐藏文件和子目录名。
-			从命令输出中查找特定行:
+			从命令输出中查找特定行:  
 				```bash
 				[root@test test]# dmesg |grep "usb"
 				[    0.678613] usbcore: registered new interface driver usbfs
@@ -679,7 +680,93 @@ git push -u origin main
 	复制文件或目录
 	`cp /home/user/file.txt /home/user/Documents`
 
+18. mv  
+	移动或重命名文件或目录
+	`mv /home/user/file.txt /home/user/Documents/newfile.txt`
 
+19. ps  
+	显示当前运行的进程。
+	`kill [PID]` 结束某个进程
+ 
+20. paste  
+	它的主要用途是将多个文件的行合并在一起，默认情况下，它会将将多个文件按照列队列进行合并，并使用制表符（\t）作为分隔符。paste 命令不会修改原始文件，它只会输出合并后的内容到标准输出  
+	`paste [OPTION]... [FILE]...`
+	[OPTION]	
+		-d, --delimiters=LIST：使用 LIST 中的字符作为分隔符，而不是制表符。例如，-d',' 将使用逗号作为分隔符。
+			'-->'也只会显示'-'
+		-s, --serial：将每个文件的行串行化，而不是并行合并。这会将每个文件的所有行合并为一个长行。
+
+21. locate  
+	locate命令用于在Linux系统中快速查找文件或目录的路径。
+	它通过搜索一个预先构建的数据库（通常是/var-lib/mlocate/mlocate.db）来工作，而不是实时搜索整个文件系统，因此搜索速度非常快。这个数据库由updatedb命令定期更新，通常每天或根据系统配置更新一次。
+	`locate example.txt`
+
+22. which  
+	which 命令在 Linux 系统中用于查找可执行文件的位置。它会在环境变量 PATH 所指定的目录中搜索指定的命令，并返回第一个找到的命令的完整路径。
+	```bash
+	which [选项] 命令名
+	which ls
+	which -a java
+	```
+
+23. whereis  
+	`whereis` 是 Linux 系统中一个用于查找二进制文件、源代码文件和手册页文件的命令。它基于预先构建的数据库进行搜索，因此速度相对较快，但可能无法找到最近安装或更新的文件。  
+	`whereis` 命令搜索以下三个标准位置：
+  	1）. 二进制文件（通常位于 `/usr/bin`、`/usr/sbin`、`/bin` 或 `/sbin`）。
+  	2）. 源代码文件（通常位于 `/usr/src` 或 `/usr/local/src`）。
+  	3）. 手册页（通常位于 `/usr/share/man`）。
+	
+	`whereis [选项] [文件名]`  
+	[选项]  
+		`-b`：只查找二进制文件。
+    `-m`：只查找手册页文件。
+    `-s`：只查找源代码
+
+24. type  
+	type 命令是 Linux 系统中一个强大而常用的工具，用于确定给定命令的类型（内建命令、外部命令、别名等）。
+	`type command_name`
+	```bash
+	type echo 	#查找内建命令
+	type ls 		#查找外部命令
+	type if 		#检查关键字
+	```
+
+25. alias  
+	如果你经常使用某些 Linux 命令，你可以使用 alias 命令为这些常用命令创建一个短名，以提升你的工作效率。
+	**临时别名仅在当前终端会话有效，关闭后消失**
+	例`alias ll='ls -al'`
+	```bash
+	alias 				# 列出所有别名
+	alias ll 			# 查看 ll 对应的具体命令
+	unalias 别名		# 别名删除语法
+	unalias -a 		# 删除当前Shell环境中所有的别名
+	```
+
+	高级技巧  
+	 1) 别名持久化
+	　　将别名写入 Shell 配置文件，永久生效：
+	　　Bash 用户：
+	　　```echo ‘alias ll=“ls -alh”’ >> ~/.bashrc
+	　　source ~/.bashrc # 立即生效```
+	　　Zsh 用户：
+	　　```echo ‘alias ll=“ls -alh”’ >> ~/.zshrc
+	　　source ~/.zshrc```
+	 2) 组合命令
+	　　用&&串联多个操作：
+	　　`alias update=“sudo apt update && sudo apt upgrade -y”`
+	　　输入update即可一键更新系统。
+	 3) 绕过别名调用原命令
+	　　在别名命令前加\可临时禁用别名：
+	　　`\ls # 调用原生 ls 而非别名`           
+	 4) 注意事项:  
+		 避免覆盖重要命令：
+	　　`alias ls=“ls -l” # 可能破坏脚本中对 ls 的依赖`
+	　　兼容性问题：不同 Shell（Csh/Bash/Zsh）配置文件路径名字不同。
+	　　慎用危险操作：如
+	　　`alias sudo=“sudo rm -rf /”（绝对禁止！）`
+
+26. source  
+	
 ---
 
 # 杂项
