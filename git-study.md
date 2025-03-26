@@ -687,6 +687,12 @@ git push -u origin main
 19. ps  
 	显示当前运行的进程。
 	`kill [PID]` 结束某个进程
+
+	使用kill -l 可以列举所有支持的信号：9) SIGKILL 和 15) SIGTERM 
+
+	kill(默认值`kill -15`)和`kill -9`的区别: 
+		在使用`kill -9`前，应该先使用`kill -15`，给目标进程一个清理善后工作的机会。如果没有，可能会留下一些不完整的文件或状态，从而影响服务的再次启动。
+
  
 20. paste  
 	它的主要用途是将多个文件的行合并在一起，默认情况下，它会将将多个文件按照列队列进行合并，并使用制表符（\t）作为分隔符。paste 命令不会修改原始文件，它只会输出合并后的内容到标准输出  
@@ -765,8 +771,69 @@ git push -u origin main
 	　　慎用危险操作：如
 	　　`alias sudo=“sudo rm -rf /”（绝对禁止！）`
 
-26. source  
-	
+26. source   
+	 source 命令在 Linux 和其他 Unix-like 系统中用于在当前 shell 会话中读取并执行指定文件中的命令。这意味着，当你使用 source 命令运行一个脚本时，该脚本中的变量、函数和其他 shell 特性都会在当前 shell 会话中生效，而不仅仅是在子 shell 中。
+
+	 `source filename`等同于`. filename`  
+	  在这里，filename 是想要在当前 shell 会话中运行的脚本的名称。
+
+	 举例1:
+	  如果只是简单地运行这个脚本（例如使用 `./vidisit_variables.sh` 或 `bash vidisit_variables.sh`），那么 MY_VARIABLE 变量只会在子 shell 中存在，并在脚本结束后消失。如果在脚本的同一 shell 会话中使用 source 命令运行它，那么 MY_VARIABLE 变量就会在当前 shell 会话中设置，并且可以在当前 shell 会话中访问它。
+
+	  假设有一个名为 vidisit_variables.sh 的脚本，内容如下：
+	  ```bash
+	  #!/bin/bash 
+		 
+		 
+		MY_VARIABLE="Hello, vidisit.cn!" 
+		echo "This is in the script: $MY_VARIABLE"
+		```
+
+	 	```bash
+	 	[root@ecs-52a1 home]# sh vidisit_variables.sh 
+		This is in the script: Hello, vidisit.cn!
+		[root@ecs-52a1 home]#
+		[root@ecs-52a1 home]#echo $MY_VARIABLE
+		 
+		[root@ecs-52a1 home]#
+		[root@ecs-52a1 home]#
+		[root@ecs-52a1 home]# source vidisit_variables.sh 
+		This is in the script: Hello, vidisit.cn!
+		[root@ecs-52a1 home]#
+		[root@ecs-52a1 home]#
+		[root@ecs-52a1 home]# echo $MY_VARIABLE
+		Hello, vidisit.cn!
+		[root@ecs-52a1 home]#
+		[root@ecs-52a1 home]#
+		```
+
+	 举例2:
+	 	刷新当前 shell 环境: 当修改了 .bashrc 或 .profile 等配置文件后，可以使用 source 命令重新加载它们，使新的配置立即生效，而无需注销并重新登录。
+	 	`source ~/.bashrc`
+	 	
+
+
+27. sh  
+	在 macOS 的终端中输入 sh 后出现 sh-3.2$，表示你已进入 Bourne Shell 兼容模式（sh 的子 Shell 环境）。
+
+	如何退出 sh 环境？直接输入 exit;按下组合键 Ctrl + D
+
+	修改默认 Shell（可选）：
+		```bash
+		echo $SHELL  # 查看默认 Shell
+		echo $0       # 查看当前 Shell 类型
+		```
+
+	修改默认 Shell（可选）:
+		```bash
+		chsh -s /bin/bash  # 修改为 bash
+		chsh -s /bin/zsh   # 修改为 zsh
+		```
+
+
+
+
+
 ---
 
 # 杂项
