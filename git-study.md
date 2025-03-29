@@ -692,7 +692,6 @@ git push -u origin main
 
 	kill(默认值`kill -15`)和`kill -9`的区别: 
 		在使用`kill -9`前，应该先使用`kill -15`，给目标进程一个清理善后工作的机会。如果没有，可能会留下一些不完整的文件或状态，从而影响服务的再次启动。
-
  
 20. paste  
 	它的主要用途是将多个文件的行合并在一起，默认情况下，它会将将多个文件按照列队列进行合并，并使用制表符（\t）作为分隔符。paste 命令不会修改原始文件，它只会输出合并后的内容到标准输出  
@@ -772,12 +771,12 @@ git push -u origin main
 	　　`alias sudo=“sudo rm -rf /”（绝对禁止！）`
 
 26. source   
-	 source 命令在 Linux 和其他 Unix-like 系统中用于在当前 shell 会话中读取并执行指定文件中的命令。这意味着，当你使用 source 命令运行一个脚本时，该脚本中的变量、函数和其他 shell 特性都会在当前 shell 会话中生效，而不仅仅是在子 shell 中。
+	source 命令在 Linux 和其他 Unix-like 系统中用于在当前 shell 会话中读取并执行指定文件中的命令。这意味着，当你使用 source 命令运行一个脚本时，该脚本中的变量、函数和其他 shell 特性都会在当前 shell 会话中生效，而不仅仅是在子 shell 中。
 
-	 `source filename`等同于`. filename`  
+	`source filename`等同于`. filename`  
 	  在这里，filename 是想要在当前 shell 会话中运行的脚本的名称。
 
-	 举例1:
+	  举例1:
 	  如果只是简单地运行这个脚本（例如使用 `./vidisit_variables.sh` 或 `bash vidisit_variables.sh`），那么 MY_VARIABLE 变量只会在子 shell 中存在，并在脚本结束后消失。如果在脚本的同一 shell 会话中使用 source 命令运行它，那么 MY_VARIABLE 变量就会在当前 shell 会话中设置，并且可以在当前 shell 会话中访问它。
 
 	  假设有一个名为 vidisit_variables.sh 的脚本，内容如下：
@@ -807,11 +806,20 @@ git push -u origin main
 		[root@ecs-52a1 home]#
 		```
 
-	 举例2:
-	 	刷新当前 shell 环境: 当修改了 .bashrc 或 .profile 等配置文件后，可以使用 source 命令重新加载它们，使新的配置立即生效，而无需注销并重新登录。
-	 	`source ~/.bashrc`
-	 	
+		权限小问题:  
+			若是直接`./vidisit_variables.sh`,会提示`zsh: permission denied: ./vidisit_variables.sh`
+			错误原因:Unix-like 系统（包括 macOS）中，直接运行脚本文件需满足以下条件：
+				可执行权限：文件必须被标记为“可执行”（通过权限位 x）。
+				正确的解释器路径：脚本首行需指定解释器（如 #!/bin/bash），但这不影响权限错误。
+				若未赋予权限，系统会拒绝执行脚本并提示 Permission denied。
+			解决方案:  
+				使用 chmod 命令为脚本添加执行权限：`chmod +x vidisit_variables.sh`
+				验证权限:`ls -l vidisit_variables.sh`
 
+
+	  举例2:
+		 	刷新当前 shell 环境: 当修改了 .bashrc 或 .profile 等配置文件后，可以使用 source命令重新加载它们，使新的配置立即生效，而无需注销并重新登录。
+		 	`source ~/.bashrc`
 
 27. sh  
 	在 macOS 的终端中输入 sh 后出现 sh-3.2$，表示你已进入 Bourne Shell 兼容模式（sh 的子 Shell 环境）。
@@ -830,6 +838,27 @@ git push -u origin main
 		chsh -s /bin/zsh   # 修改为 zsh
 		```
 
+28. du  
+	du命令是用于显示目录或文件占用的磁盘空间。
+		显示人类可读格式（-h）
+		仅显示总计（-s）,而不显示其子目录的大小。
+		-c: 除了显示目录大小外，额外一行显示总占用量
+		-d: 是 --max-depth=N 选项的简写，表示深入到第几层目录,超过指定层数目录则忽略；比如-d1，-d2
+
+	`du`：统计当前目录（含隐藏项），逐层递归子目录并汇总总大小。du ./* 会单独列出文件大小，而 du 仅统计目录（文件大小被包含在所属目录中，不单独显示）。
+	`du ./*`：./* 通配符不匹配隐藏文件（如 .git）,分别处理每个非隐藏条目（文件/目录），显示独立结果，不包含隐藏项和当前目录总汇总。
+
+	显示目录的总和大小
+	`[root@jeven ~]# du -sh /etc/sysconfig/`
+
+	查看当前目录下文件所占的空间
+	`[root@jeven ~]# du -sh ./*`
+
+	将目录下的文件从大到小进行排序
+	`[root@jeven ~]# du -sh /etc/sysconfig/*  |sort -rh`
+
+29. df  
+	`df -h`显示磁盘使用空间
 
 
 
