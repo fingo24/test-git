@@ -211,6 +211,11 @@ git push -u origin main
 	# 递归搜索当前目录下的所有 .git 文件夹，并输出其父目录路径
 	find /path/to/search -name ".git" -type d 2>/dev/null | sed 's/\/.git//'
 	```
+		- sed 的全称是：Stream Editor 流编辑器，在 Linux 中是一个强大的文本处理工具，可以处理文件或标准输入流:
+			文本替换`sed 's/old/new/' file`
+			s 表示替换操作（substitute），默认的分界符是斜杠（/），
+			\/.git 匹配路径中的 /.git 字符串（\/ 转义斜杠）。`sed 's/\/.git//'`含义为匹配/.git 字符串替换为空字符串，即删除find输出结果路径末尾的 /.git
+
 	替换 /path/to/search：如搜索整个硬盘用 /（macOS/Linux），或指定目录如 ~/Documents;排除某些路径（如缓存目录）：
 	```bash
 	find / -name ".git" -type d 2>/dev/null -not -path "/tmp/*" -not -path "/node_modules/*"
@@ -352,7 +357,43 @@ git push -u origin main
 		输出内容过多:
 			退出分页器：直接按 q 键; 临时禁用分页器：`git --no-pager diff`
 
+5. Github删除历史提交记录的方法  
+	1) `git log`或者在github上面找到历史hash值；
+	2) 回滚到相应的提交状态`git reset --hard commit-hash`
+	3) `git push origin HEAD --force`
 
+6. 交互式变基命令(修改已提交近几次commit)  
+	`git rebase -i HEAD~3 -x "your_command" #rebase HEAD之前的3次提交`
+	是一个结合交互式操作和自动执行命令的高级用法，主要用于批量修改提交历史。
+
+	操作步骤:
+		1) 按i进入编辑模式，将需要修改的commit前面的pick改为edit，编辑完成后按ESC，输入:wq 退出；
+			- 默认所有提交标记为 pick，表示保留提交。若需调整提交（如合并、删除），可修改 pick 为其他指令（如 squash、drop）
+			- 可以调整提交顺序（通过移动行位置），删除提交（删除对应行）
+		2) 编辑需要修改的代码，然后git add 修改的文件；
+		3) `git commit --amend`保存，如果不需要编辑commit信息可使用`git commit --amend --no-edit`；
+		最后`git rebase --continue`完成rebase 进入下一个编辑或直接退出，中途不想继续编辑修改可用`git rebase --abort` 退出。
+
+
+	参数解释:
+		-i（--interactive）表示启动交互式变基，会打开编辑器让用户选择如何调整提交（如合并、删除、修改提交信息等）。
+		-x "<command>"（--exec <command>）对每个提交自动执行一条命令,此参数通常用于批量自动化操作。例如：
+			-x "git commit --amend --no-edit"：保留提交内容但修改元信息（如作者、时间）。
+			-x "git reset HEAD~1"：撤销提交。
+		HEAD~3: 指定操作范围为当前分支的最新提交（HEAD）及其前两个提交（共3个提交）
+
+	使用举例:  
+		1) 假设你想修改最近 3 次提交的作者邮箱（例如修复隐私邮箱问题）：
+			`git rebase -i HEAD~3 -x "git commit --amend --author 'New Name <new-email@example.com>' --no-edit"`
+			如果只需修改作者信息，无需更改提交顺序或内容，直接保存退出编辑器即可。
+		2) 批量添加文件到所有提交:
+			`git rebase -i HEAD~3 -x "git add missing-file.txt && git commit --amend --no-edit"`
+		3) 批量修改提交时间:
+			`git rebase -i HEAD~3 -x "git commit --amend --date=now --no-edit"`
+
+7. git reflog  
+	当不小心进行了错误的操作（如误删分支、重置等）并希望恢复丢失的提交时，或者想要理解HEAD和分支引用的变化过程时，可以查看所有的历史操作记录。然后再使用，
+	`git reset --hard commit-hash`
 
 ---
 
@@ -364,7 +405,7 @@ git push -u origin main
 2. 使用rm命令     
 	`rm filename.txt`
 	`rm *.txt`
-		`rm -i *.?`交互式执行rm命令，每个匹配的文件将依次显示。如果回答“y”或“Y”，则文件将被删除。如果回答其他，则保留该文件。
+		`rm -i *?`交互式执行rm命令，每个匹配的文件将依次显示。如果回答“y”或“Y”，则文件将被删除。如果回答其他，则保留该文件。
  		
 3. 创建文件夹     
    `mkdir 新文件夹名`
@@ -454,7 +495,7 @@ git push -u origin main
 6. 通配符:     
 		|  通配符   | 含义  |
 		|  -------  | ---------------------|
-		| ？（问号） | 代表任意1个字符，有且一个字符 |
+		| ？（问号） | 代表任意1k个字符，有且一个字符 |
 		| * （星号） | 代表任意数个字符，可以是0个或者1个或者多个 |
 		| [ ]（中括号） | 表示可以匹配字符组中的任意一个字符 |
 
@@ -462,8 +503,9 @@ git push -u origin main
 		指代表示操作范围是当前目录下的所有文件/目录。
 		如`open .`	
 		会在finder打开当前目录的文件夹;
+
 		如`git rm -rf .`
-		强制递归删除当前目录下所有已被 Git 跟踪的文件和子目录。
+		强制(f)递归(r)删除当前目录下所有已被 Git 跟踪的文件和子目录。
 
 8. 查看文件内容     
 		`cat testfile.txt`
@@ -481,12 +523,12 @@ git push -u origin main
 
 		- 重定向文件描述符(对于重定向中的标准输出模式，可以省略文件描述符1 不写；而错误输出模式的文件描述符 2是必须要写的):
 			标准输入(stdin)重定向（文件描述符为 0）：默认从键盘输入，也可从其他文件或命令中输入
-      标准输出(stdout)重定向（文件描述符为 1）：默认输出到屏幕
-      错误输出(stderr)重定向（文件描述符为 2）：默认输出到屏幕
+	      标准输出(stdout)重定向（文件描述符为 1）：默认输出到屏幕
+	      错误输出(stderr)重定向（文件描述符为 2）：默认输出到屏幕
     
-    - /dev/null 文件
-    	如果希望执行某个命令，但又不希望在屏幕上显示输出结果，那么可以将输出重定向到 /dev/null
-    	如"who > /dev/null"
+ 	   - /dev/null 文件
+	    	如果希望执行某个命令，但又不希望在屏幕上显示输出结果，那么可以将输出重定向到 /dev/null
+	    	如`who > /dev/null`
    	
 10. 输入重定向符<     
 		在Shell中，我们使用'<'操作符来进行输入重定向。我们可以将文件内容作为命令的输入。
@@ -500,14 +542,14 @@ git push -u origin main
 		<< tag: 将开始标记 tag 和结束标记 tag 之间的内容作为输入。
 			Here Document（即时文本输入）:
 			```bash
-				cat << EOF > mymessage.txt
-				Hello,
-				This is a message.
-				 
-				Best Regards,
-				我是一个例子
-				EOF
-				```
+			cat << EOF > mymessage.txt
+			Hello,
+			This is a message.
+			 
+			Best Regards,
+			我是一个例子
+			EOF
+			```
 
 11. 管道操作符('|')与列表操作符('&&'和'||')     
 		管道操作符(将一个命令的输出作为另一个命令的输入):
@@ -538,7 +580,7 @@ git push -u origin main
 
 		使用find处理多个补丁文件:
 			`find patches/ -name "*.patch" -exec patch -p1 < {} \;`
-			解析:递归搜索 patches/ 目录下的所有 .patch 文件；对每个找到的 .patch 文件执行 patch 命令({} 是占位符，会被替换为当前找到的文件路径（例如 patches/fix-bug1.patch），`\;` 表示命令结束)
+			解析: 递归搜索 patches/ 目录下的所有 .patch 文件；对每个找到的 .patch 文件执行 patch 命令({} 是占位符，会被替换为当前找到的文件路径（例如 patches/fix-bug1.patch），`\;` 表示命令结束)
 
 13. who和w     
 		w：展示哪些用户正在登录
@@ -558,9 +600,9 @@ git push -u origin main
 
 		```bash
 		$ wc -l << EOF
-    欢迎来到
-    菜鸟教程
-    www.runoob.com
+	   欢迎来到
+	   菜鸟教程
+	   www.runoob.com
 		EOF	 # 输出结果为 3	
 		```
 
@@ -647,10 +689,10 @@ git push -u origin main
 	        {m,n}：至少m次，至多n次；
 	        {m,}：至少m次；
 	        {0,n}：至多次；
-	      `grep -E "hello|world" file.txt`
-	    -f：从文件中读取模式,从指定文件中读取多行模式进行搜索。
-	    	`grep -f pattern.txt file.txt`	在 file.txt 中查找 pattern.txt 文件中的每个模式。
-	    -o：仅输出匹配部分,而不是整行。
+		     `grep -E "hello|world" file.txt`
+		   -f：从文件中读取模式,从指定文件中读取多行模式进行搜索。
+		   	`grep -f pattern.txt file.txt`	在 file.txt 中查找 pattern.txt 文件中的每个模式。
+		   -o：仅输出匹配部分,而不是整行。
 
 	  grep 正则表达式示例：  
 	  	匹配开头的字符串 ^：`grep "^hello" file.txt`
@@ -658,7 +700,7 @@ git push -u origin main
 	  	匹配任意单字符 .：`grep "h.llo" file.txt`
 	  	匹配多个字符 \*：grep "hel\*o" file.txt
 	  	匹配字符范围 [a-z]：`grep "h[a-z]llo" file.txt`
-	  	匹配多个模式 |（需配合 -E 或 egrep 使用）：`grep -E "hello|world" file.txt`
+	  	匹配多个模式 |（需配合 -E 或 egrep 使用）：`grep -E "hello|world" file.txt` |代表或
 
 	  实用示例:  
 	  	在系统日志中查找错误信息:  
@@ -677,7 +719,7 @@ git push -u origin main
 			忽略二进制文件搜索文本:  
 				`grep -I "hello" *`
 					-I	忽略二进制文件，仅搜索文本文件。
-					\*	Shell通配符，匹配当前目录下的所有非隐藏文件和子目录名。
+					`*` Shell通配符，匹配当前目录下的所有非隐藏文件和子目录名。
 			从命令输出中查找特定行:  
 				```bash
 				[root@test test]# dmesg |grep "usb"
@@ -741,8 +783,8 @@ git push -u origin main
 	- 在 macOS 的终端（Shell）中，如果进程被中断（例如通过 Ctrl+Z 暂停），可以通过以下方法重新进入或恢复进程:
 		```bash
 		jobs       # 查看作业号
-		fg %1     # 恢复第一个作业到前台
-		bg %2   # 恢复作业号为 2 的进程到后台
+		fg %1      # 恢复第一个作业到前台
+		bg %2      # 恢复作业号为 2 的进程到后台
 		```
 
 	- 遇到有时候无法kill的进程，除了kill -9之外:可以先用`bg %1`使程序后台跑完或者在后台跑时候再kill
@@ -754,6 +796,8 @@ git push -u origin main
 		-d, --delimiters=LIST：使用 LIST 中的字符作为分隔符，而不是制表符。例如，-d',' 将使用逗号作为分隔符。
 			'-->'也只会显示'-'
 		-s, --serial：将每个文件的行串行化，而不是并行合并。这会将每个文件的所有行合并为一个长行。
+
+	举例`paste -d ' ' file1 file2 file3 > file`
 
 21. locate  
 	locate命令用于在Linux系统中快速查找文件或目录的路径。
@@ -770,16 +814,17 @@ git push -u origin main
 
 23. whereis  
 	`whereis` 是 Linux 系统中一个用于查找二进制文件、源代码文件和手册页文件的命令。它基于预先构建的数据库进行搜索，因此速度相对较快，但可能无法找到最近安装或更新的文件。  
+
 	`whereis` 命令搜索以下三个标准位置：
-  	1）. 二进制文件（通常位于 `/usr/bin`、`/usr/sbin`、`/bin` 或 `/sbin`）。
-  	2）. 源代码文件（通常位于 `/usr/src` 或 `/usr/local/src`）。
-  	3）. 手册页（通常位于 `/usr/share/man`）。
+	  	1) 二进制文件（通常位于 `/usr/bin`、`/usr/sbin`、`/bin` 或 `/sbin`）。
+	  	2) 源代码文件（通常位于 `/usr/src` 或 `/usr/local/src`）。
+	  	3) 手册页（通常位于 `/usr/share/man`）。
 	
 	`whereis [选项] [文件名]`  
 	[选项]  
 		`-b`：只查找二进制文件。
-    `-m`：只查找手册页文件。
-    `-s`：只查找源代码
+	   `-m`：只查找手册页文件。
+	   `-s`：只查找源代码
 
 24. type  
 	type 命令是 Linux 系统中一个强大而常用的工具，用于确定给定命令的类型（内建命令、外部命令、别名等）。
@@ -793,36 +838,36 @@ git push -u origin main
 25. alias  
 	如果你经常使用某些 Linux 命令，你可以使用 alias 命令为这些常用命令创建一个短名，以提升你的工作效率。
 	**临时别名仅在当前终端会话有效，关闭后消失**
-	例`alias ll='ls -al'`
 	```bash
-	alias 				# 列出所有别名
-	alias ll 			# 查看 ll 对应的具体命令
+	alias ll='ls -al'  # 设置ll
+	alias 				 # 列出所有别名
+	alias ll 		  	# 查看 ll 对应的具体命令
 	unalias 别名		# 别名删除语法
 	unalias -a 		# 删除当前Shell环境中所有的别名
 	```
 
-	高级技巧  
-	 1) 别名持久化
-	　　将别名写入 Shell 配置文件，永久生效：
-	　　Bash 用户：
-	　　```echo ‘alias ll=“ls -alh”’ >> ~/.bashrc
-	　　source ~/.bashrc # 立即生效```
-	　　Zsh 用户：
-	　　```echo ‘alias ll=“ls -alh”’ >> ~/.zshrc
-	　　source ~/.zshrc```
-	 2) 组合命令
-	　　用&&串联多个操作：
-	　　`alias update=“sudo apt update && sudo apt upgrade -y”`
-	　　输入update即可一键更新系统。
-	 3) 绕过别名调用原命令
-	　　在别名命令前加\可临时禁用别名：
-	　　`\ls # 调用原生 ls 而非别名`           
-	 4) 注意事项:  
-		 避免覆盖重要命令：
-	　　`alias ls=“ls -l” # 可能破坏脚本中对 ls 的依赖`
-	　　兼容性问题：不同 Shell（Csh/Bash/Zsh）配置文件路径名字不同。
-	　　慎用危险操作：如
-	　　`alias sudo=“sudo rm -rf /”（绝对禁止！）`
+	高级技巧:  
+		1) 别名持久化
+		　　将别名写入 Shell 配置文件，永久生效：
+		　　Bash 用户：
+		　　```echo ‘alias ll=“ls -alh”’ >> ~/.bashrc
+		　　source ~/.bashrc # 立即生效```
+		　　Zsh 用户：
+		　　```echo ‘alias ll=“ls -alh”’ >> ~/.zshrc
+		　　source ~/.zshrc```
+		2) 组合命令
+		　　用&&串联多个操作：
+		　　`alias update=“sudo apt update && sudo apt upgrade -y”`
+		　　输入update即可一键更新系统。
+		3) 绕过别名调用原命令
+		　　在别名命令前加\可临时禁用别名：
+		　　`\ls # 调用原生 ls 而非别名`           
+		4) 注意事项:  
+			 避免覆盖重要命令：
+		　　`alias ls=“ls -l” # 可能破坏脚本中对 ls 的依赖`
+		　　兼容性问题：不同 Shell（Csh/Bash/Zsh）配置文件路径名字不同。
+		　　慎用危险操作：如
+		　　`alias sudo=“sudo rm -rf /”（绝对禁止！）`
 
 26. source   
 	source 命令在 Linux 和其他 Unix-like 系统中用于在当前 shell 会话中读取并执行指定文件中的命令。这意味着，当你使用 source 命令运行一个脚本时，该脚本中的变量、函数和其他 shell 特性都会在当前 shell 会话中生效，而不仅仅是在子 shell 中。
@@ -838,27 +883,27 @@ git push -u origin main
 	  #!/bin/bash 
 		 
 		 
-		MY_VARIABLE="Hello, vidisit.cn!" 
-		echo "This is in the script: $MY_VARIABLE"
-		```
+	  MY_VARIABLE="Hello, vidisit.cn!" 
+	  echo "This is in the script: $MY_VARIABLE"
+	  ```
 
-	 	```bash
-	 	[root@ecs-52a1 home]# sh vidisit_variables.sh 
-		This is in the script: Hello, vidisit.cn!
-		[root@ecs-52a1 home]#
-		[root@ecs-52a1 home]#echo $MY_VARIABLE
-		 
-		[root@ecs-52a1 home]#
-		[root@ecs-52a1 home]#
-		[root@ecs-52a1 home]# source vidisit_variables.sh 
-		This is in the script: Hello, vidisit.cn!
-		[root@ecs-52a1 home]#
-		[root@ecs-52a1 home]#
-		[root@ecs-52a1 home]# echo $MY_VARIABLE
-		Hello, vidisit.cn!
-		[root@ecs-52a1 home]#
-		[root@ecs-52a1 home]#
-		```
+	  ```bash
+	  [root@ecs-52a1 home]# sh vidisit_variables.sh 
+	  This is in the script: Hello, vidisit.cn!
+	  [root@ecs-52a1 home]#
+	  [root@ecs-52a1 home]#echo $MY_VARIABLE
+	   
+	  [root@ecs-52a1 home]#
+	  [root@ecs-52a1 home]#
+	  [root@ecs-52a1 home]# source vidisit_variables.sh 
+	  This is in the script: Hello, vidisit.cn!
+	  [root@ecs-52a1 home]#
+	  [root@ecs-52a1 home]#
+	  [root@ecs-52a1 home]# echo $MY_VARIABLE
+	  Hello, vidisit.cn!
+	  [root@ecs-52a1 home]#
+	  [root@ecs-52a1 home]#
+	  ```
 
 		权限小问题:  
 			若是直接`./vidisit_variables.sh`,会提示`zsh: permission denied: ./vidisit_variables.sh`
@@ -951,7 +996,18 @@ git push -u origin main
 	   killall Finder 
 	   ```
    - Git仓库管理忽略 DS_Store 文件
-    1. 将 . DS_Store 加入全局的 .gitignore 文件，执行命令：
-		`echo .DS_Store >> ~/.gitignore_global`
+	   1. 将 . DS_Store 加入全局的 .gitignore 文件，执行命令：
+			`echo .DS_Store >> ~/.gitignore_global`
 		2. 将这个全局的 .gitignore 文件加入Git的全局config文件中，执行命令：
-		`git config --global core.excludesfile ~/.gitignore_global`
+			`git config --global core.excludesfile ~/.gitignore_global`
+
+
+## Homebrew相关
+
+1. 如何卸载brew安装的软件
+	`brew uninstall [软件名]`
+
+	可以使用`brew list`明确是否已清除
+
+	之后使用`brew cleanup`清理卸载残留
+
