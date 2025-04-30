@@ -112,7 +112,32 @@ git push -u origin main
 
 ---
 
-## 如何把某个项目从git里移除
+
+## 几个常用git应用场景
+
+### github token过期 
+
+- 生成新的GitHub Token  
+	访问GitHub并登录，进入 Settings → Developer Settings → Personal Access Tokens (PAT)。点击 Generate new token。输入描述（如“My Mac”），选择权限（至少勾选 repo 以允许推送代码）。生成Token后，立即复制保存（关闭页面后无法再次查看）。
+
+- 更新本地Git凭据  
+	1) 在终端运行以下命令清除旧凭据（输入后按两次 Ctrl+D 退出）:  
+		```bash
+		git credential-osxkeychain erase
+		host=github.com
+		protocol=https
+		```
+	2) 直接修改远程仓库URL（临时方案）:  
+	`git remote set-url origin https://<USERNAME>:<NEW_TOKEN>@github.com/<USERNAME>/<REPO>.git`
+	（替换 <USERNAME>, <NEW_TOKEN>, <REPO> 为实际值）
+
+- 查看当前远程仓库URL：  
+	`git remote -v`
+
+- 验证配置:  
+	`git push`
+
+### 如何把某个项目从git里移除
 
 1. 本地移除项目
 	如果你只是想从本地Git仓库中移除项目，但不打算影响远程仓库，你可以使用以下命令：
@@ -179,7 +204,7 @@ git push -u origin main
 
 ---
 
-## 如何把不小心init的目录（如根目录）从git中移除
+### 如何把不小心init的目录（如根目录）从git中移除
 
 1. 根目录:
 	1) 验证根目录下是否有git文件(/: 根目录，可以改为其他目录; grep:文本搜索工具)
@@ -222,6 +247,7 @@ git push -u origin main
 	```
 
 ---
+
 
 ## 几个常用的git语句
 
@@ -406,7 +432,7 @@ git push -u origin main
 	`rm filename.txt`
 	`rm *.txt`
 		`rm -i *?`交互式执行rm命令，每个匹配的文件将依次显示。如果回答“y”或“Y”，则文件将被删除。如果回答其他，则保留该文件。
- 		
+
 3. 创建文件夹     
    `mkdir 新文件夹名`
    -p：递归创建目录，即创建多级目录。如果上级目录不存在，则会一并创建; 否则则会提示错误，并且无法创建出你所要创建的目录
@@ -1000,7 +1026,6 @@ git push -u origin main
 			`echo .DS_Store >> ~/.gitignore_global`
 		2. 将这个全局的 .gitignore 文件加入Git的全局config文件中，执行命令：
 			`git config --global core.excludesfile ~/.gitignore_global`
-
 
 ## Homebrew相关
 
